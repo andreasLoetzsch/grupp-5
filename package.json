@@ -4,7 +4,7 @@
   "main": ".src/service.js",
   "scripts": {
     "test": "jest",
-    "dev": "node --watch .src/service.js",
+    "dev": "node --watch ./src/service.js",
     "start": "node ./src/service.js"
   },
   "keywords": [],
@@ -16,6 +16,7 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.9.5",
     "path": "^0.12.7"
   }
 }
