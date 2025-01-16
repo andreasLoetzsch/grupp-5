@@ -40,7 +40,7 @@ const userLogin = async (req, res) => {
         const accesToken = jwt.sign(
             {id: user._id, role: user.role, username: user.username},
             process.env.ACCES_TOKEN_SECRET_KEY,
-            {expiresIn: '2m'}
+            {expiresIn: '15m'}
         )
         const refreshToken = jwt.sign(
             {id: user._id, role: user.role, username: user.username},
@@ -63,4 +63,57 @@ const userLogin = async (req, res) => {
      }
 }
 
-module.exports = { userRegister, userLogin };
+const refreshToken = async (req, res) =>{
+    const {refreshToken} = req.cookies
+    const  authHeader = req.headers.authorization
+    const accesToken = authHeader && authHeader.split(" ")[1]
+    if(!refreshToken){
+        return res.status(403).send('Token missing')
+    }
+    try{
+        if(accesToken){
+            try{
+                jwt.verify(accesToken, process.env.ACCES_TOKEN_SECRET_KEY)
+                return res.status(200).json({accesToken, message: 'Token not expired'})
+            }catch(error){
+                if(error.name !== "TokenExpiredError"){
+                    return res.status(403).send('Invalid token')
+                }
+            }
+        }
+        const decoded = await jwt.decode(refreshToken)
+        const user = await User.findOne({_id: decoded.id})
+        if(!user){
+            res.status(403).send('User missing')
+        }
+        const isValid = await bcrypt.compare(refreshToken, user.refreshToken)
+        if(!isValid){
+            return res.status(403).send('Invalid token')
+        }
+        const newAccesToken = jwt.sign(
+            {id: user._id, role: user.role, username: user.username},
+            process.env.ACCES_TOKEN_SECRET_KEY,
+            {expiresIn: '15m'}
+        )
+        const newRefreshToken = jwt.sign(
+            {id: user._id, role: user.role, username: user.username},
+            process.env.REFRESH_TOKEN_SECRET_KEY,
+            {expiresIn: '7d'}
+        )
+        const hashedRefreshToken = await bcrypt.hash(newRefreshToken, 10)
+        user.refreshToken = hashedRefreshToken
+        await user.save()
+        res.cookie("refreshToken", newRefreshToken, {
+            httpOnly: true, 
+            secure: true,
+            sameSite: "strict", 
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        })
+        res.status(200).json({accesToken: newAccesToken})
+    }
+    catch(error){
+        res.status(500).send('Server error')
+    }
+}
+
+module.exports = { userRegister, userLogin, refreshToken };
