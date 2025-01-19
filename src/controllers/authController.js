@@ -82,7 +82,7 @@ const refreshToken = async (req, res) =>{
             }
         }
         const decoded = await jwt.decode(refreshToken)
-        const user = await User.findOne({_id: decoded.id})
+        const user = await User.findOne({_id: decoded.id}, "_id username refreshToken")
         if(!user){
             res.status(403).send('User missing')
         }
