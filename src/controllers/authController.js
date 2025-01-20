@@ -25,8 +25,8 @@ const userRegister = async (req, res) => {
 const userLogin = async (req, res) => {
     const {username, password} = req.body
     if(!username || !password){
-        console.error('No cridentials submited')
-        res.status(400).send('No cridentials submited')
+        console.error('No credentials submited')
+        res.status(400).send('No credentials submited')
     }
     try{
         const user = await User.findOne({username})
@@ -35,7 +35,7 @@ const userLogin = async (req, res) => {
         }
         const isMatch = await bcrypt.compare(password, user.password)
         if(!isMatch) {
-            res.json({succes: false, message: 'Invalid cridentials'})
+            res.json({succes: false, message: 'Invalid credentials'})
         }
         const accesToken = jwt.sign(
             {id: user._id, role: user.role, username: user.username},
