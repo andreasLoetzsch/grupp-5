@@ -1,12 +1,12 @@
 const User = require("../models/userModel");
 
 const getUsers = async (req, res) => {
-  const users = await User.find();
+  const users = await User.find({}, "_id username role");
   res.json(users);
 };
 
 const getUserById = async (req, res) => {
-  const user = await User.findById(req.params.userId);
+  const user = await User.findById({_id:req.params.userId}, "_id username role");
 
   if (!user) {
     return res.status(404).send("User not found");
