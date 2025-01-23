@@ -1,17 +1,17 @@
 const User = require("../models/userModel");
 
 const getUsers = async (req, res) => {
-  const users = await User.find();
-  res.json(users);
+    const users = await User.find({}, "_id username role");
+    res.json(users);
 };
 
 const getUserById = async (req, res) => {
-  const user = await User.findById(req.params.userId);
+    const user = await User.findById({ _id: req.params.userId }, "_id username role");
 
-  if (!user) {
-    return res.status(404).send("User not found");
-  }
-  res.json(user);
+    if (!user) {
+        return res.status(404).send("User not found");
+    }
+    res.json(user);
 };
 const deleteUser = async (req, res) => {
     try {
@@ -23,7 +23,7 @@ const deleteUser = async (req, res) => {
             });
         }
 
-      
+
         if (req.user.id === req.params.userId) {
             return res.status(403).json({
                 success: false,
@@ -32,7 +32,7 @@ const deleteUser = async (req, res) => {
         }
 
         await User.findByIdAndDelete(req.params.userId);
-        
+
         res.status(200).json({
             success: true,
             message: 'User successfully deleted'
