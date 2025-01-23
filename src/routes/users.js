@@ -6,6 +6,6 @@ const { isAdmin, isLoggedIn } = require('../middleware/auth');
 router.get("/", isLoggedIn, getUsers);
 router.get("/:userId", isLoggedIn, getUserById);
 router.delete('/:userId', isAdmin, deleteUser);
-router.patch('/edit', isLoggedIn, updateUser);
+router.patch('/edit:userId', isLoggedIn, updateUser);
 
 module.exports = router;
