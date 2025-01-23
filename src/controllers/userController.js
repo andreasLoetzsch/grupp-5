@@ -46,5 +46,43 @@ const deleteUser = async (req, res) => {
     }
 };
 
+const updateUser = async (req, res) => {
+    try {
+      const { name, email } = req.body;
+  
+     
+      const user = await User.findById(req.params.userId);
+  
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: "User not found",
+        });
+      }
+  
+     
+      if (name) user.name = name;
+      if (email) user.email = email;
+  
+      
+      await user.save();
+  
+      res.status(200).json({
+        success: true,
+        message: "User successfully updated",
+        user,
+      });
+    } catch (error) {
+      console.error("Error updating user:", error);
+      res.status(500).json({
+        success: false,
+        message: "Server error",
+      });
+    }
+  };
 
-module.exports = { getUsers, getUserById, deleteUser };
+
+
+
+module.exports = { getUsers, getUserById, deleteUser, updateUser };
+
