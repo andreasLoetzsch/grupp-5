@@ -12,7 +12,7 @@ const isAdmin = async (req, res, next) => {
     }
 
     try {
-        const decoded = jwt.verify(token, process.env.ACCES_TOKEN_SECRET_KEY);
+        const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET_KEY);
         console.log(decoded)
         if (decoded.role !== 'admin') {
             return res.status(403).json({
@@ -42,7 +42,7 @@ const isLoggedIn = async (req, res, next) => {
         return res.status(401).send('Token missing');
     }
     try {
-        const decoded = jwt.verify(accessToken, process.env.ACCES_TOKEN_SECRET_KEY);
+        const decoded = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET_KEY);
         req.user = decoded;
 
         next();

@@ -1,7 +1,8 @@
 const User = require("../models/userModel");
 
+
 const getUsers = async (req, res) => {
-  const users = await User.find({}, "_id username role");
+  const users = await User.find({}, "_id username role email");
   res.json(users);
 };
 
@@ -81,7 +82,53 @@ const updateUser = async (req, res) => {
 };
 
 
+const inviteUserToConversation = async (req, res) => {
+  try {
+    const { conversationId } = req.body;
+    const invitedUserId = req.params.userId;
+
+    const invitedUser = await User.findById(invitedUserId);
+    if (!invitedUser) {
+      return res.status(404).json({
+        success: false,
+        message: 'Invited user not found'
+      });
+    }
+
+    const conversation = invitedUser.conversations.id(conversationId);
+    if (!conversation) {
+      return res.status(404).json({
+        success: false,
+        message: 'Conversation not found'
+      });
+    }
+
+    if (conversation.participants.includes(invitedUserId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'User is already in the conversation'
+      });
+    }
+
+    conversation.participants.push(invitedUserId);
+    await invitedUser.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'User invited to conversation successfully',
+      conversation
+    });
+  } catch (error) {
+    console.error('Error inviting user to conversation:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+};
 
 
-module.exports = { getUsers, getUserById, deleteUser, updateUser };
+
+
+module.exports = { getUsers, getUserById, deleteUser, updateUser, inviteUserToConversation};
 
