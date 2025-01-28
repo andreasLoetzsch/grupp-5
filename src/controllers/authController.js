@@ -49,8 +49,6 @@ const userLogin = async (req, res) => {
             { expiresIn: '7d' }
         )
 
-        console.log('Generated refreshToken:', refreshToken);
-
         const hashedRefreshToken = await bcrypt.hash(refreshToken, 10)
         user.refreshToken = hashedRefreshToken
         await user.save()
