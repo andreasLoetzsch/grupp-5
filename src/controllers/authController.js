@@ -1,6 +1,7 @@
 const { User } = require('../models/userModel');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken')
+require('dotenv').config()
 
 const userRegister = async (req, res) => {
     const { username, password, email, role, } = req.body;
@@ -62,8 +63,8 @@ const userLogin = async (req, res) => {
         return res.json({ success: true, message: 'LOGGED_IN', accessToken })
     }
     catch (error) {
-        console.error('Error durin login',error);
-        return res.json({ succes: false, message: 'ERROR_VERIFYING' })
+
+        return res.status(500).json({ succes: false, message: 'ERROR_VERIFYING' })
 
     }
 }
