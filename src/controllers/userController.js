@@ -1,4 +1,4 @@
-const User = require("../models/userModel");
+const { User } = require("../models/userModel");
 
 
 const getUsers = async (req, res) => {
@@ -49,7 +49,7 @@ const deleteUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
   try {
-    const { name, email } = req.body;
+    const { username, email } = req.body;
 
     const user = await User.findById(req.params.userId);
 
@@ -61,7 +61,7 @@ const updateUser = async (req, res) => {
     }
 
 
-    if (name) user.name = name;
+    if (username) user.username = username;
     if (email) user.email = email;
 
 
@@ -69,8 +69,7 @@ const updateUser = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "User successfully updated",
-      user,
+      message: "User successfully updated"
     });
   } catch (error) {
     console.error("Error updating user:", error);
@@ -130,5 +129,5 @@ const inviteUserToConversation = async (req, res) => {
 
 
 
-module.exports = { getUsers, getUserById, deleteUser, updateUser, inviteUserToConversation};
+module.exports = { getUsers, getUserById, deleteUser, updateUser, inviteUserToConversation };
 
