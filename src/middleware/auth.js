@@ -55,3 +55,4 @@ const isLoggedIn = async (req, res, next) => {
 };
 
 module.exports = { isAdmin, isLoggedIn };
+
