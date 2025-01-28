@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken')
 
 const userRegister = async (req, res) => {
-    const { username, password, role, } = req.body;
+    const { username, password, email, role, } = req.body;
 
     if (!username || !password) {
         console.error('Username and password required');
@@ -13,7 +13,7 @@ const userRegister = async (req, res) => {
     try {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
-        const newUser = await new User({ username, password: hashedPassword, role });
+        const newUser = await new User({ username, password: hashedPassword, role, email });
         await newUser.save();
         res.status(201).send('User registered');
     } catch (error) {
@@ -29,9 +29,6 @@ const userLogin = async (req, res) => {
         return res.status(400).send('No credentials submited')
     }
     try {
-        console.log("Access Token Key:", process.env.ACCESS_TOKEN_SECRET_KEY);
-        console.log("Refresh Token Key:", process.env.REFRESH_TOKEN_SECRET_KEY);
-
         const user = await User.findOne({ username })
         if (!user) {
             return res.json({ succes: false, message: 'User not found' })
@@ -63,7 +60,7 @@ const userLogin = async (req, res) => {
     }
     catch (error) {
         return res.json({ succes: false, message: 'ERROR_VERIFYING' })
-        
+
     }
 }
 

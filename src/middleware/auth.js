@@ -13,7 +13,6 @@ const isAdmin = async (req, res, next) => {
 
     try {
         const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET_KEY);
-        console.log(decoded)
         if (decoded.role !== 'admin') {
             return res.status(403).json({
                 success: false,
