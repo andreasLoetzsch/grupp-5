@@ -1,6 +1,7 @@
 const { User } = require('../models/userModel');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken')
+require('dotenv').config()
 
 const userRegister = async (req, res) => {
     const { username, password, email, role, } = req.body;
@@ -38,7 +39,7 @@ const userLogin = async (req, res) => {
             return res.json({ succes: false, message: 'Invalid credentials' })
         }
         const accessToken = jwt.sign(
-            { id: user._id, username: user.username, role: user.role, email },
+            { id: user._id, username: user.username, role: user.role, email: user.email },
             process.env.ACCESS_TOKEN_SECRET_KEY,
             { expiresIn: '15m' }
         )
@@ -59,7 +60,7 @@ const userLogin = async (req, res) => {
         return res.json({ success: true, message: 'LOGGED_IN', accessToken })
     }
     catch (error) {
-        return res.json({ succes: false, message: 'ERROR_VERIFYING' })
+        return res.status(500).json({ succes: false, message: 'ERROR_VERIFYING' })
 
     }
 }
