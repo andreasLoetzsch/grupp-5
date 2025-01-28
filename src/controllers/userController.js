@@ -1,5 +1,5 @@
-const { User } = require("../models/userModel");
-
+const { User, Conversation } = require("../models/userModel");
+const jwt = require('jsonwebtoken')
 
 const getUsers = async (req, res) => {
   const users = await User.find({}, "_id username role email");
@@ -80,13 +80,46 @@ const updateUser = async (req, res) => {
   }
 };
 
+const createConversation = async (req, res) => {
+  try {
+    const creatorId = req.user.id
+    const conversation = new Conversation({
+      participants: [creatorId]
+    })
+    await conversation.save()
+    res.status(200).json({ sucess: true, message: 'Conversation created', conversation })
+  } catch (error) {
+    console.error('Error creating conversation', error)
+    res.status(500).json({ success: false, message: 'Server error' })
+  }
+}
 
-const inviteUserToConversation = async (req, res) => {
+const inviteToConversation = async (req, res) => {
+  try {
+    const userId = req.user.id
+    console.log(userId)
+    const conversations = await Conversation.find({
+      participants: userId
+    }).populate('participants', 'username')
+    res.status(200).json({ success: true, conversations })
+  } catch (error) {
+    console.error('Error fetching conversations', error)
+    res.status(500).json({ success: false, message: 'Server error' })
+  }
+}
+
+
+
+
+const getConversation = async (req, res) => {
   try {
     const { conversationId } = req.body;
     const invitedUserId = req.params.userId;
 
     const invitedUser = await User.findById(invitedUserId);
+
+
+
     if (!invitedUser) {
       return res.status(404).json({
         success: false,
@@ -94,7 +127,7 @@ const inviteUserToConversation = async (req, res) => {
       });
     }
 
-    const conversation = invitedUser.conversations.id(conversationId);
+    const conversation = await Conversation.findById(conversationId)
     if (!conversation) {
       return res.status(404).json({
         success: false,
@@ -129,5 +162,5 @@ const inviteUserToConversation = async (req, res) => {
 
 
 
-module.exports = { getUsers, getUserById, deleteUser, updateUser, inviteUserToConversation };
+module.exports = { getUsers, getUserById, deleteUser, updateUser, createConversation, getConversation, inviteToConversation };
 
