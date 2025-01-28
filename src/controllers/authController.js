@@ -38,7 +38,7 @@ const userLogin = async (req, res) => {
             return res.json({ succes: false, message: 'Invalid credentials' })
         }
         const accessToken = jwt.sign(
-            { id: user._id, username: user.username, role: user.role, email },
+            { id: user._id, username: user.username, role: user.role, email: user.email },
             process.env.ACCESS_TOKEN_SECRET_KEY,
             { expiresIn: '15m' }
         )
@@ -47,6 +47,9 @@ const userLogin = async (req, res) => {
             process.env.REFRESH_TOKEN_SECRET_KEY,
             { expiresIn: '7d' }
         )
+
+        console.log('Generated refreshToken:', refreshToken);
+
         const hashedRefreshToken = await bcrypt.hash(refreshToken, 10)
         user.refreshToken = hashedRefreshToken
         await user.save()
@@ -59,6 +62,7 @@ const userLogin = async (req, res) => {
         return res.json({ success: true, message: 'LOGGED_IN', accessToken })
     }
     catch (error) {
+        console.error('Error durin login',error);
         return res.json({ succes: false, message: 'ERROR_VERIFYING' })
 
     }
