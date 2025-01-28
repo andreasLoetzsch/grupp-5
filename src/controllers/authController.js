@@ -1,4 +1,4 @@
-const { User } = require('../models/userModel');
+const  User  = require('../models/userModel');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken')
 require('dotenv').config()
@@ -83,7 +83,7 @@ const refreshToken = async (req, res) => {
                 }
             }
         }
-        const decoded = await jwt.decode(refreshToken)
+        const decoded = jwt.decode(refreshToken)
         const user = await User.findOne({ _id: decoded.id }, "_id username refreshToken")
         if (!user) {
             res.status(403).send('User missing')
