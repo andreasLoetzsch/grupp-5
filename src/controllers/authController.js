@@ -48,6 +48,9 @@ const userLogin = async (req, res) => {
             process.env.REFRESH_TOKEN_SECRET_KEY,
             { expiresIn: '7d' }
         )
+
+        console.log('Generated refreshToken:', refreshToken);
+
         const hashedRefreshToken = await bcrypt.hash(refreshToken, 10)
         user.refreshToken = hashedRefreshToken
         await user.save()
@@ -60,6 +63,7 @@ const userLogin = async (req, res) => {
         return res.json({ success: true, message: 'LOGGED_IN', accessToken })
     }
     catch (error) {
+
         return res.status(500).json({ succes: false, message: 'ERROR_VERIFYING' })
 
     }
