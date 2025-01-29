@@ -17,16 +17,22 @@ const createConversation = async (req, res) => {
   
   const getConversation = async (req, res) => {
     try {
-      const userId = req.user.id
+      const userId = req.user.id;
+  
+      // Hämta endast konversations-ID:n där användaren är en deltagare
       const conversations = await Conversation.find({
         participants: userId
-      }).populate('participants', 'username')
-      res.status(200).json({ success: true, conversations })
+      }).select('_id'); // Välj endast _id
+  
+      // Extrahera konversations-ID:n till en lista
+      const conversationIds = conversations.map(conversation => conversation._id);
+  
+      res.status(200).json({ success: true, conversationIds });
     } catch (error) {
-      console.error('Error fetching conversations', error)
-      res.status(500).json({ success: false, message: 'Server error' })
+      console.error('Error fetching conversations', error);
+      res.status(500).json({ success: false, message: 'Server error' });
     }
-  }
+  };
   
   
   

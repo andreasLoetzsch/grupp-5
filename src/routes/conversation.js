@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { createConversation, getConversation, inviteToConversation, } = require("../controllers/conversationController");
 const { isLoggedIn, verifyAuth } = require("../middleware/auth");
-const { Conversation } = require("../models/conversationModels");
+const Conversation = require("../models/conversationModel");
 
 router.post("/", isLoggedIn, createConversation);
 
@@ -10,7 +10,7 @@ router.get("/", isLoggedIn, getConversation);
 
 router.post("/:conversationId/invite/:userId", isLoggedIn, inviteToConversation);
 
-router.get("/conversations", verifyAuth, async (req, res) => {
+router.get("/conversations", isLoggedIn, async (req, res) => {
   try {
     const userId = req.user.id;
 
