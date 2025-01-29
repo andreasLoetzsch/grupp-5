@@ -19,12 +19,11 @@ const createConversation = async (req, res) => {
     try {
       const userId = req.user.id;
   
-      // Hämta endast konversations-ID:n där användaren är en deltagare
       const conversations = await Conversation.find({
         participants: userId
-      }).select('_id'); // Välj endast _id
+      }).select('_id');
   
-      // Extrahera konversations-ID:n till en lista
+    
       const conversationIds = conversations.map(conversation => conversation._id);
   
       res.status(200).json({ success: true, conversationIds });
