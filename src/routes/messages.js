@@ -1,8 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { sendMessage, getMessages, getUserConversations } = require('../controllers/messageController');
+const { sendMessage, getMessages, getUserConversations, deleteMessage } = require('../controllers/messageController');
 const { isLoggedIn } = require('../middleware/auth');
-
 
 router.post('/', isLoggedIn, sendMessage);
 
