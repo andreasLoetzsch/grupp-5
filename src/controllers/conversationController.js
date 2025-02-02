@@ -1,19 +1,40 @@
+const mongoose = require("mongoose");
 const Conversation  = require('../models/conversationModel')
+const Message = require('../models/messageModel');
 const User = require('../models/userModel')
 
 const createConversation = async (req, res) => {
     try {
-      const creatorId = req.user.id
-      const conversation = new Conversation({
-        participants: [creatorId]
-      })
-      await conversation.save()
-      res.status(200).json({ sucess: true, message: 'Conversation created', conversation })
+        if (!req.user || !req.user.id) {
+            return res.status(401).json({ success: false, message: "Unauthorized. Please log in." });
+        }
+
+        const creatorId = req.user.id;
+        let { participants } = req.body;
+
+       
+        if (!Array.isArray(participants)) {
+            participants = [];
+        }
+        
+       
+        if (!participants.includes(creatorId)) {
+            participants.push(creatorId);
+        }
+
+        const conversation = new Conversation({
+            participants: participants
+        });
+
+        await conversation.save();
+        res.status(201).json({ success: true, message: "Conversation created", conversation });
     } catch (error) {
-      console.error('Error creating conversation', error)
-      res.status(500).json({ success: false, message: 'Server error' })
+        console.error("Error creating conversation:", error);
+        res.status(500).json({ success: false, message: "Server error" });
     }
-  }
+};
+
+
   
   const getConversation = async (req, res) => {
     try {
@@ -83,5 +104,39 @@ const createConversation = async (req, res) => {
       });
     }
   };
+ const deleteConversation = async (req, res) => {
+    try {
+        const { conversationId } = req.params;
+        const userId = req.user.id; // Authenticated user
+
+     
+        if (!mongoose.Types.ObjectId.isValid(conversationId)) {
+            return res.status(400).json({ success: false, message: "Invalid conversation ID" });
+        }
+
+    
+        const conversation = await Conversation.findById(conversationId);
+        if (!conversation) {
+            return res.status(404).json({ success: false, message: "Conversation not found" });
+        }
+
+        if (!conversation.participants.map(id => id.toString()).includes(userId)) {
+            return res.status(403).json({ success: false, message: "Unauthorized to delete this conversation" });
+        }
+
+     
+        await Message.deleteMany({ conversationId });
+
+      
+        await Conversation.findByIdAndDelete(conversationId);
+
+        res.status(200).json({ success: true, message: "Conversation deleted successfully" });
+
+    } catch (error) {
+        console.error("Error deleting conversation:", error.message);
+        res.status(500).json({ success: false, message: "Server error" });
+    }
+};
+
   
-module.exports = {createConversation, getConversation, inviteToConversation}
+module.exports = {createConversation, getConversation, inviteToConversation, deleteConversation}
